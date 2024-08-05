@@ -1,0 +1,63 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const fileInput = document.getElementById('file-upload');
+    const uploadBtn = document.getElementById('upload-btn');
+    const resultsDiv = document.getElementById('results');
+    const accountBtns = document.querySelectorAll('.account-btn');
+    let uploadedData = null;
+
+    uploadBtn.addEventListener('click', async () => {
+        const file = fileInput.files[0];
+        if (!file) {
+            alert('Please upload a file.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await response.json();
+            uploadedData = data.data;
+            displayResults(uploadedData);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+
+    accountBtns.forEach(button => {
+        button.addEventListener('click', () => {
+            const section = button.getAttribute('data-section');
+            displaySectionData(section);
+        });
+    });
+
+    function displayResults(data) {
+        resultsDiv.innerHTML = '';
+        for (const [sheetName, rows] of Object.entries(data)) {
+            const section = document.createElement('section');
+            section.innerHTML = <h2>${sheetName}</h2><pre>${JSON.stringify(rows, null, 2)}</pre>;
+            resultsDiv.appendChild(section);
+        }
+    }
+
+    function displaySectionData(section) {
+        if (!uploadedData) {
+            alert('No data available. Please upload a file first.');
+            return;
+        }
+
+        resultsDiv.innerHTML = '';
+        const sectionData = uploadedData[section];
+        if (sectionData) {
+            const sectionElement = document.createElement('section');
+            sectionElement.innerHTML = <h2>${section}</h2><pre>${JSON.stringify(sectionData, null, 2)}</pre>;
+            resultsDiv.appendChild(sectionElement);
+        } else {
+            resultsDiv.innerHTML = <p>No data available for ${section}.</p>;
+        }
+    }
+});
