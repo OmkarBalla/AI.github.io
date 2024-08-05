@@ -23,22 +23,26 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         return res.status(400).send('No file uploaded.');
     }
 
-    const workbook = xlsx.readFile(file.path);
-    const sheetNames = workbook.SheetNames;
-    const result = {};
+    try {
+        const workbook = xlsx.readFile(file.path);
+        const sheetNames = workbook.SheetNames;
+        const result = {};
 
-    sheetNames.forEach((sheetName) => {
-        const worksheet = workbook.Sheets[sheetName];
-        const data = xlsx.utils.sheet_to_json(worksheet);
-        result[sheetName] = data;
-    });
+        sheetNames.forEach((sheetName) => {
+            const worksheet = workbook.Sheets[sheetName];
+            const data = xlsx.utils.sheet_to_json(worksheet);
+            result[sheetName] = data;
+        });
 
-    // Clean up the uploaded file
-    fs.unlinkSync(file.path);
+        // Clean up the uploaded file
+        fs.unlinkSync(file.path);
 
-    // AI processing example
-    const aiResults = await processWithAI(result);
-    res.json({ data: result, aiResults });
+        // AI processing example
+        const aiResults = await processWithAI(result);
+        res.json({ data: result, aiResults });
+    } catch (error) {
+        res.status(500).send('Error processing file.');
+    }
 });
 
 async function processWithAI(data) {
@@ -46,11 +50,11 @@ async function processWithAI(data) {
     try {
         const response = await axios.post('https://api.openai.com/v1/completions', {
             model: 'text-davinci-003',
-            prompt: Analyze the following data and provide insights:\n${JSON.stringify(data, null, 2)},
+            prompt: `Analyze the following data and provide insights:\n${JSON.stringify(data, null, 2)}`,
             max_tokens: 150,
         }, {
             headers: {
-                'Authorization': Bearer ${OPENAI_API_KEY},
+                'Authorization': `Bearer ${OPENAI_API_KEY}`,
                 'Content-Type': 'application/json'
             }
         });
@@ -62,5 +66,5 @@ async function processWithAI(data) {
 }
 
 app.listen(port, () => {
-    console.log(Server running at http://localhost:${port});
+    console.log(`Server running at http://localhost:${port}`);
 });
