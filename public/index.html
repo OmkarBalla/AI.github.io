@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Data Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Excel Data Analysis</h1>
+        <form id="upload-form" enctype="multipart/form-data">
+            <input type="file" id="file-upload" name="file" accept=".xlsx">
+            <button type="button" id="upload-btn">Upload and Analyze</button>
+        </form>
+
+        <div id="account-sections">
+            <button class="account-btn" data-section="Account Overview">Account Overview</button>
+            <button class="account-btn" data-section="Transaction History">Transaction History</button>
+            <!-- Add more sections as needed -->
+        </div>
+
+        <div id="results"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
