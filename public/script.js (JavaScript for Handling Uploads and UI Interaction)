@@ -20,11 +20,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST',
                 body: formData,
             });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
             const data = await response.json();
             uploadedData = data.data;
             displayResults(uploadedData);
         } catch (error) {
             console.error('Error:', error);
+            resultsDiv.innerHTML = '<p>Error uploading or processing file.</p>';
         }
     });
 
@@ -39,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsDiv.innerHTML = '';
         for (const [sheetName, rows] of Object.entries(data)) {
             const section = document.createElement('section');
-            section.innerHTML = <h2>${sheetName}</h2><pre>${JSON.stringify(rows, null, 2)}</pre>;
+            section.innerHTML = `<h2>${sheetName}</h2><pre>${JSON.stringify(rows, null, 2)}</pre>`;
             resultsDiv.appendChild(section);
         }
     }
@@ -54,10 +60,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const sectionData = uploadedData[section];
         if (sectionData) {
             const sectionElement = document.createElement('section');
-            sectionElement.innerHTML = <h2>${section}</h2><pre>${JSON.stringify(sectionData, null, 2)}</pre>;
+            sectionElement.innerHTML = `<h2>${section}</h2><pre>${JSON.stringify(sectionData, null, 2)}</pre>`;
             resultsDiv.appendChild(sectionElement);
         } else {
-            resultsDiv.innerHTML = <p>No data available for ${section}.</p>;
+            resultsDiv.innerHTML = `<p>No data available for ${section}.</p>`;
         }
     }
 });
